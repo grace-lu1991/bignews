@@ -44,7 +44,7 @@
                     <label for="inputPassword3" class="col-sm-2 control-label">用户图标：</label>
                     <div class="col-sm-10">
                         <img src="images/2.jpg" alt="" class="user_pic">
-                        <input style="display: block" name="userPic" type="file" id="exampleInputFile">
+                        <input style="display: none" name="userPic" type="file" id="exampleInputFile">
                         <!-- 给label标签的for属性赋值,值是input标签的id,那这样的话点击label就相当于点击了input -->
                         <br>
                         <label for="exampleInputFile">
@@ -78,10 +78,51 @@ $(function(){
         type : 'get',
         success : function(res){
             if(res.code == 200){
-                console.log(res)
+                // console.log(res);
+                for(var key in res.data){
+                    $('input.'+key).val(res.data[key]);
+                    $('.user_pic').attr('src',res.data.userPic);
+                }
             }
         }
-    })
+    });
+    // 文件预览，给file表单注册onchange事件
+    $('#exampleInputFile').on('change',function(){
+        let file = this.files[0];
+        console.log(file)
+        let url =URL.createObjectURL(file);
+        $('.user_pic').attr('src',url);
+    });
+    // 编辑个人信息，用Formdata上传图片
+//    给修改按钮注册点击事件
+$('.btn-edit').on('click',function(e){
+ e.preventDefault();
+ let form = $('#form')[0];
+ let userData = new FormData(form)
+$.ajax({
+    url : BigNew.user_edit,
+    type : 'post',
+    processData : false,
+    contentType : false,
+    data : userData,
+    success : function(res){
+        if (res.code == 200){
+            $.ajax({
+                url : BigNew.user_info,
+                type : 'get',
+                success : function(res){
+                    parent.$('.user_info img').attr('src', res.data.userPic);
+                    parent.$('.user_center_link img').attr('src', res.data.userPic);
+                    parent.$('.user_info span').html(`欢迎&nbsp;&nbsp;${res.data.nickname}`);
+                }
+            })
+        }
+    }
+});
+
+
+
+})
 })
 
 
