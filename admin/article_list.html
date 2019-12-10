@@ -132,9 +132,10 @@
                     if (res.code == 200) {
                         let dataStr = template('list-temp', res);
                         $('tbody').html(dataStr);
-                        if (res.data.data.length != 0 && callback != 0) {
+                        if (res.data.data.length != 0 && callback != null) {
                             $('#pagination-demo').show();
                             $('.tips').hide();
+                            callback(res);
                         }else if(res.data.data.length == 0){
                             $('#pagination-demo').hide();
                             $('.tips').show();
@@ -157,7 +158,7 @@
                 next: '下一页',
                 last: '尾页',
                 onPageClick: function (event, page) {
-                    mypage = page;
+                    myPage = page;
                     getData(myPage,null)
                 }
             });
