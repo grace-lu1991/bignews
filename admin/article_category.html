@@ -91,7 +91,7 @@
                 <td>{{$value.slug}}</td>
                 <td class="text-center">
                     <a href="javascript:void(0)" data-toggle="modal" data-target="#myModal" class=" btn btn-info btn-xs" data-id="{{$value.id}}">编辑</a>
-                    <a href="javascript:void(0)" class="btn btn-danger btn-xs" data-id="{{$value.id}}">删除</a>
+                    <a href="javascript:void(0)" class="btn btn-danger btn-xs" data-id="{{$value.id}}" id='btn-delete'>删除</a>
                 </td>
             </tr>
         {{/each}}
@@ -99,16 +99,19 @@
 
     <script>
         $(function () {
-            $.ajax({
-                url: BigNew.category_list,
-                type: 'get',
-                dataType: 'json',
-                success: function (res) {
-                    if (res.code == 200) {
-                        $('tbody').html(template('art-template', res));
+            getData();
+            function getData() {
+                $.ajax({
+                    url: BigNew.category_list,
+                    type: 'get',
+                    dataType: 'json',
+                    success: function (res) {
+                        if (res.code == 200) {
+                            $('tbody').html(template('art-template', res));
+                        }
                     }
-                }
-            });
+                });
+            }
             // 当点击取消按钮的时候需要重置数据
             $('.btn-default').on('click', function () {
                 $('form')[0].reset()
@@ -120,33 +123,98 @@
                     $('#exampleModalLabel').text('新增文章分类');
                     $('#btn-confirm').text('新增').addClass('btn-success').removeClass('btn-primary');
                     // 要将表单的数据全部重置
-                   $('form')[0].reset();
-                //    console.log($('form'))
-                $('#btn-confirm').on('click',function(){
-                    let name = $('#recipient-name').val();
-                    let slug = $(message-text).val();
-                    if(name == ''|| slug == ''){
-                        alert(请输入内容);
-                        return;
-                        $.ajax({
-                            url : BigNew.category_add,
-                            type : 'post',
-                            dataType : 'json',
-                            data : {
-                                name : name,
-                                slug : slug
-                            },
-                            success : function(res){
+                    $('form')[0].reset();
+                    //    console.log($('form'))
+                    $('#btn-confirm').on('click', function () {
+                        let name = $('#recipient-name').val();
+                        let slug = $(message - text).val();
+                        if (name == '' || slug == '') {
+                            alert(请输入内容);
+                            return;
+                            $.ajax({
+                                url: BigNew.category_add,
+                                type: 'post',
+                                dataType: 'json',
+                                data: {
+                                    name: name,
+                                    slug: slug
+                                },
+                                success: function (res) {
+                                    $('#myModal').modal('hide');
+                                    getData();
+                                }
+                            })
+                        }
+                    })
+                } else {
+                    $('#exampleModalLabel').text('编辑文章分类');
+                    $('#btn-confirm').text('编辑').addClass('btn-primary').removeClass('btn-success');
+                    // 当弹出的编辑框模态框的时候需要得到一个ID，根据这个ID发送ajax请求获取文章类别信息
+                    let dataId = $(dom).attr('data-id');
+                    $.ajax({
+                        url: BigNew.category_search,
+                        type: 'get',
+                        dataType: 'json',
+                        data: {
+                            id: dataId
+                        },
+                        success: function (res) {
+                            if (res.code == 200) {
+                                // console.log(res)
+                                $('#recipient-name').val(res.data[0].name);
+                                $('#message-text').val(res.data[0].slug);
+                                $('#dataID').val(res.data[0].id);
 
                             }
-                        })
-                    }
-                })
-                }else{
-                    $('#exampleModalLabel').text('编辑文章分类');
+                        }
+                    });
 
+                    $('#btn-confirm').on('click', function () {
+                        let name = $('#recipient-name').val();
+                        let slug = $('#message-text').val();
+                        let dataID = $('#dataID').val();
+                        $.ajax({
+                            url: BigNew.category_edit,
+                            type: 'post',
+                            dataType: 'json',
+                            data: {
+                                name: name,
+                                slug: slug,
+                                id: dataID,
+                            },
+                            success: function (res) {
+                                if (res.code == 200) {
+                                    $('#myModal').modal('hide');
+                                    getData();
+
+                                }
+                            }
+
+                        })
+                    });
+                };
+            });
+            // 点击删除
+            $('tbody').on('click', '#btn-delete', function () {
+            
+                let dataId = $(this).attr('data-id');
+                let ans = confirm('你确定要删除么');
+                console.log(ans)
+                if (ans) {
+                    $.ajax({
+                        url: BigNew.category_delete,
+                        type: 'post',
+                        dataType: 'json',
+                        data: { id: dataId },
+                        success: function (res) {
+                            if (res.code == 204) {
+                                getData();
+                            }
+
+                        }
+                    })
                 }
-            })
+            });
         })
 
 
