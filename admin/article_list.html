@@ -56,7 +56,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
+                    <!-- <tr>
                         <td>王积千造统最头</td>
                         <td>杰克</td>
                         <td>奇趣事</td>
@@ -66,7 +66,7 @@
                             <a href="article_edit.html" class="btn btn-default btn-xs">编辑</a>
                             <a href="javascript:void(0);" class="btn btn-danger btn-xs delete">删除</a>
                         </td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
             <div class="row text-center">
@@ -117,7 +117,7 @@
                 }
             }
         });
-        function getData(myPage,callback) {
+        function getData(pages,callback) {
             $.ajax({
                 url: BigNew.article_query,
                 data: 'get',
@@ -125,11 +125,12 @@
                 data: {
                     type: $('#selCategory').val(),
                     state: $('#selStatus').val(),
-                    page: myPage,
+                    page: pages,
                     perpage: perpage,
                 },
                 success: function (res) {
                     if (res.code == 200) {
+                        console.log(res)
                         let dataStr = template('list-temp', res);
                         $('tbody').html(dataStr);
                         if (res.data.data.length != 0 && callback != null) {
