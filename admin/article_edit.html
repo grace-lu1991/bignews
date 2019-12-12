@@ -14,6 +14,7 @@
     <script src="./libs/jquery-1.12.4.min.js"></script>
     <!-- 模板引擎 -->
     <script src="./libs/template-web.js"></script>
+    <script src="./libs/http.js"></script>
 </head>
 
 <body>
@@ -68,5 +69,41 @@
         </div>
     </div>
 </body>
+<script type="text/html" id="art-editcator">
+{{each data}}
+<option>{{$value.name}}</option>
+{{/each}}
+</script>
+<script>
+// 处理图片的预览
+$(function(){
+    $('#inputCover').on('change',function(){
+    let imgFile = this.files[0];
+    let url = URL.createObjectURL(imgFile);
+    $('.article_cover').attr('src',url);
+});
+$.ajax({
+    url : BigNew.category_list,
+    type :'get',
+    dataType : 'json',
+    success : function(res){
+        if(res.code == 200){
+            $('select').html(template('art-editcator',res))
+        }
+    }
+});
 
+
+
+
+
+
+
+})
+
+
+
+
+
+</script>
 </html>
