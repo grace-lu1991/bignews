@@ -179,11 +179,8 @@
                url : BigNew.article_delete,
                type : 'post',
                data : {id :artId },
-               success : function(res){
-                  
-                   
-                       getData(myPage,function(res){
-                       
+               success : function(res){                
+                       getData(myPage,function(res){                     
                         $('#pagination-demo').twbsPagination('changeTotalPages',res.data.totalPage,myPage)
                        })
                    
