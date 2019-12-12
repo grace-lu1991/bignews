@@ -118,6 +118,7 @@
             })
             $('#myModal').on('show.bs.modal', function (e) {
                 let dom = e.relatedTarget;
+                // console.log(e.relatedTarget)
                 // console.log( $('#xinzengfenlei'))
                 if (dom == $('#xinzengfenlei')[0]) {
                     $('#exampleModalLabel').text('新增文章分类');
