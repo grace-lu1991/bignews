@@ -88,7 +88,6 @@
     // 处理图片的预览
     $(function () {
         $('#inputCover').on('click', function () {
-            console.log('点击了');
             
                 let imgFile = this.files[0];
                 let url = URL.createObjectURL(imgFile);
@@ -126,12 +125,12 @@
             data: { id: editId },
             success: function (res) {
                 if (res.code == 200) {
-                    // console.log(res)
                     $('#inputTitle').val(res.data.title);
-                    $('img.article_cover').attr('src', res.data.cover);
-                    $('.category').val(res.data.categoryId);
-                    $('#testico').val(res.data.date);
-                    editor.txt.html(res.data.content);
+                        $('img.article_cover').attr('src', res.data.cover);
+                        $('select.category').val(res.data.categoryId);
+                        $('#testico').val(res.data.date);
+                        editor.txt.html(res.data.content);
+                   
 
 
                 }
@@ -162,7 +161,29 @@
 
         })
 
+        $('button.btn-draft').on('click', function (e) {
+                //阻止默认行为
+                e.preventDefault();
+                //使用formData的方式来提交数据
+                let fd = new FormData($('#form')[0]);
+                fd.append('content', editor.txt.html());
+                //修改完文章。默认是已经发布
+                // fd.append('state', '已发布');
+                fd.append('id', editId);
 
+                //发送ajax请求
+                $.post({
+                    url: BigNew.article_edit,
+                    data: fd,
+                    processData: false,
+                    contentType: false,
+                    success: function (res) {
+                        if (res.code == 200) {
+                            window.history.back();
+                        }
+                    }
+                })
+            })
 
 
 
