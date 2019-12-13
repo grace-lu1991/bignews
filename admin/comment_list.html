@@ -179,13 +179,13 @@
   <td>{{$value.state}}</td>
   <td class="text-center">
     {{if $value.state == '已通过'}}
-    <a href="javascript:editTr( 'rejected',11 );" class="btn btn-warning btn-xs">拒绝</a>
+    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-warning btn-xs btn-nopass">拒绝</a>
     {{else if $value.state == '已拒绝'}}
-    <a href="javascript:editTr( 'rejected',11 );" class="btn btn-warning btn-xs">批准</a>
+    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-warning btn-xs btn-pass">批准</a>
     {{else if $value.state == '待审核'}}
-    <a href="javascript:editTr( 'rejected',11 );" class="btn btn-warning btn-xs">批准</a>
+    <a href="javascript:editTr( 'rejected',11 );" data-id="{{$value.id}}" class="btn btn-warning btn-xs btn-pass">批准</a>
     {{/if}}
-    <a href="javascript:void(0);;" class="btn btn-danger btn-xs">删除</a>
+    <a href="javascript:editTr( 'trashed',10 );" data-id="{{$value.id}}" class="btn btn-danger btn-xs btn-delete">删除</a>
   </td>
 </tr>
 {{/each}}
@@ -204,7 +204,7 @@
         },
         success: function (res) {
           if (res.code == 200) {
-            console.log(res)
+            // console.log(res)
             let comentStr = template('commentList', res);
             $('tbody').html(comentStr);
             if (res.data.data.length != 0 && callback != null) {
@@ -212,7 +212,8 @@
               $('.tips').hide();
               callback(res);
             }else if(res.data.totalPage.length != 0 && res.data.data.length == 0 && res.data.totalPage == myPage-1){
-              myPage-1
+              myPage-1;
+              $('#pagination').twbsPagination('changeTotalPages', res.data.totalPage, mypage)
             }else{
               $('#pagination').hide()
               $('.tips').show();
@@ -236,7 +237,47 @@
         }
       })
     });
-
+$('tbody').on('click','.btn-nopass',function(){
+  let id = $(this).attr('data-id');
+        $.post({
+          url: BigNew.comment_reject,
+          data: {
+            id: id
+          },
+          success: function (res) {
+            getComData(myPage, function () {});
+          }
+        })
+});
+$('tbody').on('click', '.btn-pass', function () {
+        let id = $(this).attr('data-id');
+        $.post({
+          url: BigNew.comment_pass,
+          data: {
+            id: id
+          },
+          success: function (res) {
+            //通过之后应该加载当前数据显示当前的页面的数据
+            getComData(myPage, function () {});
+          }
+        })
+      });
+      $('tbody').on('click', '.btn-delete', function () {
+        let id = $(this).attr('data-id');
+        if (confirm('亲，你确定要删除吗？')) {
+          $.post({
+            url: BigNew.comment_delete,
+            data: {
+              id: id
+            },
+            success: function (res) {
+              getComData(myPage, function (res) {
+                $('#pagination').twbsPagination('changeTotalPages', res.data.totalPage, myPage)
+              });
+            }
+          })
+        }
+      })
 
 
 
